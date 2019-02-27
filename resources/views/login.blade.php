@@ -6,11 +6,11 @@
         <form action="{{ route('login.post') }}" method="POST">
             @csrf
             <div class="input-field col s12">
-                <input id="email" name="email" type="text" class="validate">
+                <input id="email" name="email" type="text">
                 <label for="email">Email</label>
             </div>
             <div class="input-field col s12">
-                <input id="password" name="password" type="text" class="validate">
+                <input id="password" name="password" type="password">
                 <label for="password">Senha</label>
             </div>
             <div class="input-field col s12">

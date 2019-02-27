@@ -17,4 +17,6 @@ Route::get('/login', 'AuthController@login')->name('login');
 Route::post('/login', 'AuthController@loginPost')->name('login.post');
 Route::get('/register', 'AuthController@register')->name('register');
 Route::post('/register', 'AuthController@registerPost')->name('register.post');
-route::get('/logout', 'AuthController@logout')->name('logout');
+Route::get('/logout', 'AuthController@logout')->name('logout');
+
+Route::post('/groupings/create', 'GroupingController@createPost')->name('grouping.create');
