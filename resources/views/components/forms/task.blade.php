@@ -1,6 +1,6 @@
 @csrf
 <input type="hidden" name="grouping_id" value="{{ $grouping->id }}">
-<div class="input-field col s2 center">
+<div class="input-field col s4 m2 center">
     <input type="hidden" name="icon"/><a class="btn" onclick="taskForm.iconSelector((icon) => {
         console.log(this.previousSibling);
         this.previousSibling.value = icon;
@@ -9,7 +9,7 @@
         Ícone
     </a> 
 </div>
-<div class="input-field col s10">
+<div class="input-field col s8 m10">
     <input id="grouping-name" name="name" type="text">
     <label for="grouping-name">Nome da Tarefa</label>
 </div>

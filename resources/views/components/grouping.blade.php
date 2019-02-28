@@ -14,7 +14,9 @@
                 <ul class="collapsible popout z-depth-0">
                 @endif
                     <li>
-                        <div class="collapsible-header"><i class="material-icons">{{ $task->icon }}</i>{{ $task->name }}
+                        <div class="collapsible-header">
+                            <i class="material-icons">{{ $task->icon }}</i>
+                            {{ $task->name }}
                         </div>
                         <div class="collapsible-body">
                             @foreach($task->items as $item)
@@ -30,6 +32,22 @@
                                 </label>
                             </p>
                             @endforeach
+                            <div class="right">
+                                <a class="waves-effect red btn-floating" onclick="taskForm.moveUp(
+                                    // Pass the <li> to the function
+                                    this.parentElement
+                                    .parentElement
+                                    .parentElement, {{ $task->id }})">
+                                    <i class="material-icons">keyboard_arrow_up</i>
+                                </a>
+                                <a class="waves-effect red btn-floating" onclick="taskForm.moveDown(
+                                    // Pass the <li> to the function
+                                    this.parentElement
+                                    .parentElement
+                                    .parentElement, {{ $task->id }})">
+                                    <i class="material-icons">keyboard_arrow_down</i>
+                                </a>
+                            </div>
                         </div>
                     </li>
                 @if ($loop->last)

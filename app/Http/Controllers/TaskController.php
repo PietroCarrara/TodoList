@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Auth;
 use App\Task;
 use App\Item;
+use App\Grouping;
 
 class TaskController extends Controller
 {
@@ -18,7 +20,20 @@ class TaskController extends Controller
             'items.*' => 'min:1',
         ]);
         
-        $task = Task::create($req->all());
+        $group = Grouping::find($req->grouping_id);
+
+        if (Auth::user() != $group->user) {
+            return redirect()->back()->withErrors('You don\'t own this group!');
+        }
+        
+        $index = $group->tasks()->max('index') + 1;
+
+        $task = Task::create([
+            'icon' => $req->icon,
+            'name' => $req->name,
+            'grouping_id' => $req->grouping_id,
+            'index' => $index,
+        ]);
 
         foreach ($req->items as $item) {
             Item::create([
@@ -32,5 +47,73 @@ class TaskController extends Controller
         }
 
         return redirect(route('home'));
+    }
+
+    /**
+     * Decreases the index of a given task, so it appears more to the top
+     */
+    public function moveUp(Request $req, $id) {
+
+        $task = Task::find($id);
+        
+        if (!$task) {
+            return redirect()->back()->withErrors('This item does not exist!'); 
+        }
+
+        if ($task->grouping->user != Auth::user()) {
+            return redirect()->back()->withErrors('You don\'t own this task!'); 
+        }
+
+        $toSwitch = $task->grouping->tasks()->where('index', '<', $task->index)->get()->last();
+
+        // If we have not found someone to switch positions,
+        // we are already the first one
+        if (!$toSwitch) {
+            return redirect()->back()->withErrors('Invalid operation!');
+        }
+
+        // Switch places
+        $tmp = $task->index;
+        $task->index = $toSwitch->index;
+        $toSwitch->index = $tmp;
+
+        $toSwitch->save();
+        $task->save();
+
+        return redirect()->back();
+    }
+
+    /**
+     * Increases the index of a given item, so it appears more to the bottom
+     */
+    public function moveDown(Request $req, $id) {
+
+        $task = Task::find($id);
+        
+        if (!$task) {
+            return redirect()->back()->withErrors('This item does not exist!'); 
+        }
+
+        if ($task->grouping->user != Auth::user()) {
+            return redirect()->back()->withErrors('You don\'t own this item!'); 
+        }
+
+        $toSwitch = $task->grouping->tasks()->where('index', '>', $task->index)->first();
+
+        // If we have not found someone to switch positions,
+        // we are already the last one
+        if (!$toSwitch) {
+            return redirect()->back()->withErrors('Invalid operation!');
+        }
+
+        // Switch places
+        $tmp = $task->index;
+        $task->index = $toSwitch->index;
+        $toSwitch->index = $tmp;
+
+        $toSwitch->save();
+        $task->save();
+
+        return redirect()->back();
     }
 }

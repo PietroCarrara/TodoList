@@ -21,7 +21,9 @@ window.fetch = function (url, options) {
         } else {
             if (typeof options.body === 'undefined') {
                 options.body = new FormData();
-            } else if (options.body instanceof FormData) {
+            }
+
+            if (options.body instanceof FormData) {
                 options.body.append('_token', meta.content);
             } else {
                 console.error('fetch-laravel requires options.body to be a FormData instace!');

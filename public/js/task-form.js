@@ -67,11 +67,11 @@ taskForm.updateState = (itemId, completed) => {
 
     if (completed) {
         fetch(`/items/${itemId}/complete`, {
-            // method: 'POST',
+            method: 'POST',
         });
     } else {
         fetch(`/items/${itemId}/uncomplete`, {
-            // method: 'POST',
+            method: 'POST',
         });
     }
 }
@@ -171,4 +171,42 @@ taskForm.iconSelector = (callback) => {
 
     // Display the modal
     modal.open();
+}
+
+/**
+ * Moves an task up on the client and then notifies the server
+ * 
+ * @param {Element} elem The element to move up
+ * @param {Number} id The task id
+ */
+taskForm.moveUp = (elem, id) => { 
+    // If we are the last ones, don't do anything
+    if (elem.previousElementSibling == null) {
+        return;
+    }
+
+    elem.parentElement.insertBefore(elem,elem.previousElementSibling);
+
+    fetch(`/tasks/${id}/moveup`, {
+        method: 'POST',
+    });
+}
+
+/**
+ * Moves an task down on the client and then notifies the server
+ * 
+ * @param {Element} elem The element to move down
+ * @param {Number} id The task id
+ */
+taskForm.moveDown = (elem, id) => {
+    // If we are the last ones, don't do anything
+    if (elem.nextElementSibling == null) {
+        return;
+    }
+
+    elem.parentElement.insertBefore(elem,elem.nextElementSibling.nextSibling);
+
+    fetch(`/tasks/${id}/movedown`, {
+        method: 'POST',
+    });
 }

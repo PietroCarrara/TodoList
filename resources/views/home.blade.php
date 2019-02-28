@@ -70,7 +70,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     var elems = document.querySelectorAll('.grouping-task-modal');
     var instances = M.Modal.init(elems, {
-        // Clear the modal on closing
+        // Clear the form when the modal closes
         onCloseEnd: (elem) => {
             for (var i of elem.querySelectorAll('.task-item')) {
                 i.parentElement.removeChild(i);
