@@ -2,33 +2,40 @@
 <html>
 
 <head>
+    <meta charset="utf-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script>
-        var __old_fetch__ = window.fetch;
-
-        window.fetch = (url, options) => {
-            // If the X-Requested-With header is missing,
-            // fill it, so Laravel recognizes it as an ajax request
-            if (
-            typeof options === 'undefined' ||
-            typeof options.headers === 'undefined' ||
-            typeof options.headers['X-Requested-With'] === 'undefined') {
-                options.headers['X-Requested-With'] = 'XMLHttpRequest';
-            }
-
-            return __old_fetch__(...arguments);
-        };
-    </script>
+    <script src="{{ asset('js/fetch-laravel.js') }}"></script>
 </head>
 
 <body>
-    <div class="container">
-        @yield('content')
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    {{-- Display errors as toasts --}}
-    @if ($errors->any())
+    <header>
+        <nav>
+            <div class="nav-wrapper">
+                <a href="{{ route('home') }}" class="brand-logo">TodoList</a>
+                <ul class="right hide-on-med-and-down">
+                    @auth
+                        <li><a href="{{ route('logout') }}">Logout</a></li>
+                    @else
+                        <li><a href="{{ route('register') }}">Registrar</a></li>
+                        <li><a href="{{ route('login') }}">Login</a></li>
+                    @endauth
+
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+
+    <main>
+        <div class="container">
+            @yield('content')
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        {{-- Display errors as toasts --}}
+        @if ($errors->any())
         <script>
             var errors = @json($errors->all());
 
@@ -39,8 +46,18 @@
                 });
             }
         </script>
-    @endif
-    @yield('scripts')
+        @endif
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                M.AutoInit();
+            });
+        </script>
+        @yield('scripts')
+    </main>
+
+    <footer>
+
+    </footer>
 </body>
 
 </html>

@@ -26,5 +26,6 @@ class AppServiceProvider extends ServiceProvider
     {
         // Blade aliases
         Blade::component('components.card', 'card');
+        Blade::component('components.modal', 'modal');
     }
 }
