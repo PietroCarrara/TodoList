@@ -15,7 +15,7 @@ class GroupingController extends Controller
     public function createPost(Request $req) {
 
         $req->validate([
-            'name' => 'required|unique:groupings',
+            'name' => 'required',
         ]);
 
         $group = Grouping::create([

@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="row" style="z-index: -1;">
+<div class="row">
         @forelse(Auth::user()->groupings as $grouping)
             @if ($loop->first)
                 <div class="carousel col s12" style="overflow-y: visible;">

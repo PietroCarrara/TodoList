@@ -12,6 +12,7 @@ class TaskController extends Controller
 
         $req->validate([
             'name' => 'required',
+            'icon' => 'required',
             'grouping_id' => 'required|exists:groupings,id',
             'items' => 'required|array|min:1',
             'items.*' => 'min:1',

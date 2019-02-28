@@ -23,8 +23,11 @@ taskForm.addItem = (elem) => {
     item.name = 'items[]';
     item.placeholder = 'Descrição do passo...';
 
-    var trash = root.appendChild(document.createElement('a'));
-    trash.classList.add('btn-floating', 'btn-large', 'red', 'right');
+    var trashCol = root.appendChild(document.createElement('div'));
+    trashCol.classList.add('col', 's2');
+
+    var trash = trashCol.appendChild(document.createElement('a'));
+    trash.classList.add('btn-floating', 'red');
     trash.innerHTML = '<i class="large material-icons">delete</i>';
     trash.onclick = () => {
         taskForm.remove(root);
@@ -71,4 +74,101 @@ taskForm.updateState = (itemId, completed) => {
             // method: 'POST',
         });
     }
+}
+
+taskForm.icons = [
+    'access_alarm',
+    'account_balance',
+    'account_balance_wallet',
+    'account_box',
+    'airplanemode_active',
+    'archive',
+    'attach_money',
+    'audiotrack',
+    'autorenew',
+    'backup',
+    'book',
+    'brush',
+    'build',
+    'cake',
+    'camera_alt',
+    'casino',
+    'chat',
+    'child_friendly',
+    'computer',
+    'delete',
+    'event',
+    'filter_vintage',
+    'fitness_center',
+    'flag',
+    'folder_shared',
+    'format_paint',
+    'free_breakfast',
+    'gamepad',
+    'grade',
+    'home',
+    'local_bar',
+    'local_laundry_service',
+    'local_movies',
+    'local_pizza',
+    'local_printshop',
+    'location_on',
+    'navigation',
+    'pets',
+    'power',
+    'priority_high',
+    'school',
+    'sd_card',
+    'speaker',
+    'subway',
+    'timer',
+    'favorite',
+];
+/**
+ * Pops up a icon selector modal and calls the callback with the selected icon
+ * 
+ * @param {function} callback Icon callback.
+ */
+taskForm.iconSelector = (callback) => {
+
+    // Create the modal
+    var root = document.createElement('div');
+    root.classList.add('modal');
+
+    var content = root.appendChild(document.createElement('div'))
+    content.classList.add('modal-content');
+
+    var title = content.appendChild(document.createElement('h4'));
+    title.innerText = 'Selecione um ícone:';
+
+    var container = content.appendChild(document.createElement('div'));
+    container.classList.add('row', 'center');
+
+    // Append each icon
+    for (let icon of taskForm.icons) {
+        var div = container.appendChild(document.createElement('div'));
+        div.classList.add('col', 'm3', 's4');
+
+        var i = div.appendChild(document.createElement('i'));
+        i.classList.add('material-icons');
+        i.style.cssText = 'cursor: pointer;';
+        i.innerText = icon;
+
+        i.onclick = () => {
+            callback(icon);
+            modal.close();
+        }
+    }
+
+    document.body.appendChild(root);
+
+    // Initialize the modal
+    var modal = M.Modal.init(root, {
+        onCloseEnd: () => {
+            root.parentElement.removeChild(root);
+        },
+    });
+
+    // Display the modal
+    modal.open();
 }

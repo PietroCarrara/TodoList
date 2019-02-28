@@ -14,7 +14,7 @@
                 <ul class="collapsible popout z-depth-0">
                 @endif
                     <li>
-                        <div class="collapsible-header"><i class="material-icons">filter_drama</i>{{ $task->name }}
+                        <div class="collapsible-header"><i class="material-icons">{{ $task->icon }}</i>{{ $task->name }}
                         </div>
                         <div class="collapsible-body">
                             @foreach($task->items as $item)
