@@ -61,7 +61,7 @@ class TaskController extends Controller
         }
 
         if ($task->grouping->user != Auth::user()) {
-            return redirect()->back()->withErrors('You don\'t own this task!'); 
+            return redirect()->back()->withErrors('You don\'t own this task!');
         }
 
         // Get who is right above us

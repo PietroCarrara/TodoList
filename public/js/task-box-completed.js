@@ -27,9 +27,9 @@ class TaskCompleted extends Task {
 
             this.destroy(`A tarefa <strong>${this.name}</strong> foi re-ativada.`, () => {
                 for (var i of this.items) {
-                    // Recomplete erevything if the user cancels it
+                    // Recomplete everything if the user cancels it
                     i.check.checked = true;
-                    super.onchange(i);
+                    super.onchange(i, false);
                 }
 
                 // If the animation is still rolling, we wait for it

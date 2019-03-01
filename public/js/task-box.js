@@ -143,7 +143,12 @@ class Task {
         return true;
     }
 
-    onchange(item) {
+    /**
+     * Fired when an item changes
+     * @param {Object} item The item that has been changed.
+     * @param {Boolean} shouldDestroy If this task should trigger destroy() when all items are completed
+     */
+    onchange(item, shouldDestroy = true) {
         item.completed = item.check.checked;
 
         if (item.completed) {
@@ -156,7 +161,7 @@ class Task {
             });
         }
 
-        if (this.isComplete()) {
+        if (this.isComplete() && shouldDestroy) {
             this.destroy(`A tarefa <strong>${this.name}</strong> foi completa.`, () => {
                 // Reset our items if the user cancels the completion
                 for (var i of this.items) {
