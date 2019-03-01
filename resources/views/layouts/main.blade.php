@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
     <script src="{{ asset('js/fetch-laravel.js') }}"></script>
     <script src="{{ asset('js/task-box.js') }}"></script>
+    <script src="{{ asset('js/task-box-completed.js') }}"></script>
 </head>
 
 <body>
@@ -21,6 +22,8 @@
                     <a href="{{ route('home') }}" class="brand-logo">TodoList</a>
                     <ul class="right hide-on-med-and-down">
                         @auth
+                            <li><a href="{{ route('home') }}">Ativas</a></li>
+                            <li><a href="{{ route('completed') }}">Concluídas</a></li>
                             <li><a href="{{ route('logout') }}">Logout</a></li>
                         @else
                             <li><a href="{{ route('register') }}">Registrar</a></li>

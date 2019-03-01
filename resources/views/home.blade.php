@@ -7,7 +7,9 @@
                 <div class="carousel col s12" style="overflow-y: visible;">
             @endif
                 <div class="carousel-item col s11 m6 grouping-item">
-                    @include('components.grouping')
+                    @include('components.grouping', [
+                        'completed' => isset($completed) && $completed,
+                    ])
                 </div>
             @if ($loop->last)
                 </div>

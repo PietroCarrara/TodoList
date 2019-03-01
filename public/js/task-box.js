@@ -8,10 +8,9 @@ class TaskBox {
         this.body.classList.add('collapsible', 'popout');
 
         this.text = this.element.appendChild(document.createElement('h5'));
-        this.text.innerText = 'Você não tem tarefas nesse grupo :(';
+        this.text.innerText = 'Você concluiu todas as tarefas desse grupo :)';
 
-        for (var item of tasks) {
-            var task = new Task(item);
+        for (var task of tasks) {
             task.parent = this;
             this.tasks.push(task)
             this.body.appendChild(task.element);
@@ -117,7 +116,7 @@ class Task {
         }
 
         // Add action buttons
-        var buttons = body.appendChild(document.createElement('div'));
+        var buttons = this.buttons = body.appendChild(document.createElement('div'));
         buttons.classList.add('right');
 
         var up = buttons.appendChild(document.createElement('a'));
@@ -158,49 +157,56 @@ class Task {
         }
 
         if (this.isComplete()) {
-            this.parent.remove(this);
-
-            // Notify the completion of this task
-            var root = document.createElement('div');
-            var text = root.appendChild(document.createElement('span'));
-            text.innerHTML = `A tarefa <strong>${this.name}</strong> foi completa.`;
-
-            // Button that undoes the task completion
-            var bt = root.appendChild(document.createElement('a'));
-            bt.innerText = 'Desfazer';
-            bt.classList.add('btn-flat', 'toast-action');
-            bt.onclick = () => {
-                // Dismiss toast
-                toast.dismiss();
-
-                // Reset our items
+            this.destroy(`A tarefa <strong>${this.name}</strong> foi completa.`, () => {
+                // Reset our items if the user cancels the completion
                 for (var i of this.items) {
                     i.check.checked = false;
-                    i.check.onchange(i);
+                    this.onchange(i);
                 }
 
                 // If the animation is still rolling, we wait for it
+                // If it is not, just play the "comeback" animation
                 if (this.element.classList.contains('animated')) {
                     var animationEnd = () => {
                         this.element.removeEventListener('animationend', animationEnd);
                         this.parent.add(this);
                     }
                     this.element.addEventListener('animationend', animationEnd);
-                // If it is not, just come back
                 } else {
                     this.parent.add(this);
                 }
-
-            }
-
-            var toast = M.toast({
-                html: root,
             });
         }
     }
 
+    /**
+     * Destroy this task and notify the user
+     * @param {String} notifyText The notification text to be displayed.
+     * @param {function} callback Function to call when the 'Undo' button is clicked.
+     */
+    destroy(notifyText, callback) {
+        this.parent.remove(this);
+
+        // Notify the completion of this task
+        var root = document.createElement('div');
+        var text = root.appendChild(document.createElement('span'));
+        text.innerHTML = notifyText;
+
+        // Button that undoes the task completion
+        var bt = root.appendChild(document.createElement('a'));
+        bt.innerText = 'Desfazer';
+        bt.classList.add('btn-flat', 'toast-action');
+        bt.onclick = () => {
+            callback();
+            toast.dismiss();
+        }
+        var toast = M.toast({
+            html: root,
+        });
+    }
+
     moveUp() {
-        // If we are the last ones, don't do anything
+        // If we are the first ones, don't do anything
         if (this.element.previousElementSibling == null) {
             return;
         }

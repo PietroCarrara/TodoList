@@ -64,7 +64,13 @@ class TaskController extends Controller
             return redirect()->back()->withErrors('You don\'t own this task!'); 
         }
 
-        $toSwitch = $task->grouping->tasks()->where('index', '<', $task->index)->get()->last();
+        // Get who is right above us
+        if ($task->isCompleted()) {
+            $toSwitch = $task->grouping->completeTasks();
+        } else {
+            $toSwitch = $task->grouping->incompleteTasks();
+        }
+        $toSwitch = $toSwitch->where('index', '<', $task->index)->last();
 
         // If we have not found someone to switch positions,
         // we are already the first one
@@ -98,7 +104,13 @@ class TaskController extends Controller
             return redirect()->back()->withErrors('You don\'t own this item!'); 
         }
 
-        $toSwitch = $task->grouping->tasks()->where('index', '>', $task->index)->first();
+        // Get who is right below us
+        if ($task->isCompleted()) {
+            $toSwitch = $task->grouping->completeTasks();
+        } else {
+            $toSwitch = $task->grouping->incompleteTasks();
+        }
+        $toSwitch = $toSwitch->where('index', '>', $task->index)->first();
 
         // If we have not found someone to switch positions,
         // we are already the last one

@@ -25,4 +25,14 @@ class Task extends Model
     public function getItemsAttribute() {
         return $this->items()->get();
     }
+
+    public function isCompleted() {
+        // If there is any incomplete item, we are incomplete
+        foreach($this->items as $item) {
+            if (!$item->completed) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
