@@ -7,6 +7,9 @@ class TaskBox {
         this.body = this.element.appendChild(document.createElement('ul'));
         this.body.classList.add('collapsible', 'popout');
 
+        this.text = this.element.appendChild(document.createElement('h5'));
+        this.text.innerText = 'Você não tem tarefas nesse grupo :(';
+
         for (var item of tasks) {
             var task = new Task(item);
             task.parent = this;
@@ -14,8 +17,8 @@ class TaskBox {
             this.body.appendChild(task.element);
         }
 
-        if (tasks.length <= 0) {
-            this.body.innerHTML = '<h5>Você não tem tarefas nesse grupo :(</h5>';
+        if (tasks.length > 0) {
+            this.text.style.display = 'none';
         }
     }
 
@@ -24,19 +27,27 @@ class TaskBox {
      * @param {Task} task To be added.
      */
     add(task) {
+
+        // Remove the "no tasks" warning
+        this.text.style.display = 'none';
+
+        task.parent = this;
         this.tasks.push(task);
         this.tasks = this.tasks.sort((a, b) => a.index > b.index);
 
         task.element.classList.add('animated', 'zoomInRight');
-        task.element.addEventListener('animationend', () => {
-            task.element.classList.remove('animated', 'fadeInLeft');
-        });
+
+        var animationEnd = () => {
+            task.element.classList.remove('animated', 'zoomInRight');
+            task.element.removeEventListener('animationend', animationEnd);
+        }
+        task.element.addEventListener('animationend', animationEnd);
 
         var index = this.tasks.indexOf(task);
         if (index >= this.tasks.length - 1) {
             this.body.appendChild(task.element);
         } else {
-            this.body.insertBefore(task.element, this.tasks[index+1].element);
+            this.body.insertBefore(task.element, this.tasks[index + 1].element);
         }
     }
 
@@ -47,14 +58,20 @@ class TaskBox {
     remove(task) {
         task.element.classList.add('animated', 'zoomOutRight');
 
-        task.element.addEventListener('animationend', () => {
+        var animationEnd = () => {
             task.element.parentElement.removeChild(task.element);
-            task.element.classList.remove('animated', 'fadeOutRight');
+            task.element.classList.remove('animated', 'zoomOutRight');
 
             this.tasks = this.tasks.filter((i) => i != task).sort((a, b) => a.index > b.index);
 
-            console.log(this.tasks);
-        });
+            if (this.tasks.length <= 0) {
+                this.text.style.display = 'inherit';
+            }
+
+            task.element.removeEventListener('animationend', animationEnd);
+        };
+
+        task.element.addEventListener('animationend', animationEnd);
     }
 }
 
@@ -69,6 +86,8 @@ class Task {
 
         // Ceating the DOMElement
         var elem = this.element = document.createElement('li');
+
+        this.element.task = this;
 
         var header = elem.appendChild(document.createElement('div'));
         header.classList.add('collapsible-header');
@@ -87,10 +106,11 @@ class Task {
 
             var check = label.appendChild(document.createElement('input'));
             check.type = 'checkbox';
-            check.onchange = (event) => this.onchange(item, event);
+            check.onchange = () => this.onchange(item);
             if (item.completed) {
                 check.checked = true;
             }
+            item.check = check;
 
             var span = label.appendChild(document.createElement('span'));
             span.innerText = item.desc;
@@ -111,16 +131,70 @@ class Task {
         down.onclick = () => this.moveDown();
     }
 
-    onchange(item, event) {
-        this.completed = event.target.checked;
+    /**
+     * Check if every item is complete
+     */
+    isComplete() {
+        for (var item of this.items) {
+            if (!item.completed) {
+                return false;
+            }
+        }
 
-        if (this.completed) {
+        return true;
+    }
+
+    onchange(item) {
+        item.completed = item.check.checked;
+
+        if (item.completed) {
             fetch(`/items/${item.id}/complete`, {
                 method: 'POST',
             });
         } else {
             fetch(`/items/${item.id}/uncomplete`, {
                 method: 'POST',
+            });
+        }
+
+        if (this.isComplete()) {
+            this.parent.remove(this);
+
+            // Notify the completion of this task
+            var root = document.createElement('div');
+            var text = root.appendChild(document.createElement('span'));
+            text.innerHTML = `A tarefa <strong>${this.name}</strong> foi completa.`;
+
+            // Button that undoes the task completion
+            var bt = root.appendChild(document.createElement('a'));
+            bt.innerText = 'Desfazer';
+            bt.classList.add('btn-flat', 'toast-action');
+            bt.onclick = () => {
+                // Dismiss toast
+                toast.dismiss();
+
+                // Reset our items
+                for (var i of this.items) {
+                    i.check.checked = false;
+                    i.check.onchange(i);
+                }
+
+                // If the animation is still rolling, we wait for it
+                if (this.element.classList.contains('animated')) {
+                    var animationEnd = () => {
+                        this.element.removeEventListener('animationend', animationEnd);
+                        this.parent.add(this);
+                    }
+                    this.element.addEventListener('animationend', animationEnd);
+                // If it is not, just come back
+                } else {
+                    this.parent.add(this);
+                }
+
+            }
+
+            var toast = M.toast({
+                html: root,
             });
         }
     }
@@ -131,7 +205,14 @@ class Task {
             return;
         }
 
-        this.element.parentElement.insertBefore(this.element, this.element.previousElementSibling);
+        var elem = this.element.previousElementSibling;
+
+        // Switch indexes
+        var idx = this.index;
+        this.index = elem.task.index;
+        elem.task.index = idx;
+
+        this.element.parentElement.insertBefore(this.element, elem);
 
         fetch(`/tasks/${this.id}/moveup`, {
             method: 'POST',
@@ -144,7 +225,14 @@ class Task {
             return;
         }
 
-        this.element.parentElement.insertBefore(this.element, this.element.nextElementSibling.nextSibling);
+        var elem = this.element.nextElementSibling;
+
+        // Switch indexes
+        var idx = this.index;
+        this.index = elem.task.index;
+        elem.task.index = idx;
+
+        this.element.parentElement.insertBefore(this.element, elem.nextSibling);
 
         fetch(`/tasks/${this.id}/movedown`, {
             method: 'POST',
