@@ -153,12 +153,3 @@ taskForm.iconSelector = (callback) => {
     // Display the modal
     modal.open();
 }
-
-/**
- * Moves an task down on the client and then notifies the server
- * 
- * @param {Element} elem The element to move down
- * @param {Number} id The task id
- */
-taskForm.moveDown = (elem, id) => {
-}

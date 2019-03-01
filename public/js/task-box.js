@@ -2,19 +2,60 @@ class TaskBox {
     constructor(...tasks) {
         this.tasks = [];
 
+        this.element = document.createElement('div');
+
         // <ul class="collapsible popout z-depth-0">
-        this.element = document.createElement('ul');
-        this.element.classList.add('collapsible', 'popout');
+        this.body = this.element.appendChild(document.createElement('ul'));
+        this.body.classList.add('collapsible', 'popout');
 
         for (var item of tasks) {
             var task = new Task(item);
+            task.parent = this;
             this.tasks.push(task)
-            this.element.appendChild(task.element);
+            this.body.appendChild(task.element);
         }
 
         if (tasks.length <= 0) {
-            this.element.innerHTML = '<h5>Você não tem tarefas nesse grupo :(</h5>';
+            this.body.innerHTML = '<h5>Você não tem tarefas nesse grupo :(</h5>';
         }
+    }
+
+    /**
+     * Adds a task to the box
+     * @param {Task} task To be added.
+     */
+    add(task) {
+        this.tasks.push(task);
+        this.tasks = this.tasks.sort((a, b) => a.index > b.index);
+
+        task.element.classList.add('animated', 'zoomInRight');
+        task.element.addEventListener('animationend', () => {
+            task.element.classList.remove('animated', 'fadeInLeft');
+        });
+
+        var index = this.tasks.indexOf(task);
+        if (index >= this.tasks.length - 1) {
+            this.body.appendChild(task.element);
+        } else {
+            this.body.insertBefore(task.element, this.tasks[index+1].element);
+        }
+    }
+
+    /**
+     * Removes a task from the box
+     * @param {Task} task To be removed.
+     */
+    remove(task) {
+        task.element.classList.add('animated', 'zoomOutRight');
+
+        task.element.addEventListener('animationend', () => {
+            task.element.parentElement.removeChild(task.element);
+            task.element.classList.remove('animated', 'fadeOutRight');
+
+            this.tasks = this.tasks.filter((i) => i != task).sort((a, b) => a.index > b.index);
+
+            console.log(this.tasks);
+        });
     }
 }
 
@@ -22,6 +63,7 @@ class Task {
     constructor(json) {
         this.id = json.id;
         this.icon = json.icon;
+        this.index = json.index;
         this.name = json.name;
         this.completed = json.completed;
         this.items = json.items || [];
@@ -71,7 +113,9 @@ class Task {
     }
 
     onchange(item, event) {
-        if (event.target.checked) {
+        this.completed = event.target.checked;
+
+        if (this.completed) {
             fetch(`/items/${item.id}/complete`, {
                 method: 'POST',
             });
