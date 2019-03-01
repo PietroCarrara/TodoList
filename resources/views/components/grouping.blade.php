@@ -8,54 +8,13 @@
                     <i class="material-icons">add</i>
                 </a>
             </div>
-            <div class="card-content">
-                @forelse($grouping->tasks as $task)
-                @if ($loop->first)
-                <ul class="collapsible popout z-depth-0">
-                @endif
-                    <li>
-                        <div class="collapsible-header">
-                            <i class="material-icons">{{ $task->icon }}</i>
-                            {{ $task->name }}
-                        </div>
-                        <div class="collapsible-body">
-                            @foreach($task->items as $item)
-                            <p>
-                                <label>
-                                    <input type="checkbox"
-                                    onchange="taskForm.updateState('{{ $item->id }}', this.checked)"
-                                    @if($item->completed)
-                                        checked="checked"
-                                    @endif
-                                     />
-                                    <span>{{ $item->desc }}</span>
-                                </label>
-                            </p>
-                            @endforeach
-                            <div class="right">
-                                <a class="waves-effect red btn-floating" onclick="taskForm.moveUp(
-                                    // Pass the <li> to the function
-                                    this.parentElement
-                                    .parentElement
-                                    .parentElement, {{ $task->id }})">
-                                    <i class="material-icons">keyboard_arrow_up</i>
-                                </a>
-                                <a class="waves-effect red btn-floating" onclick="taskForm.moveDown(
-                                    // Pass the <li> to the function
-                                    this.parentElement
-                                    .parentElement
-                                    .parentElement, {{ $task->id }})">
-                                    <i class="material-icons">keyboard_arrow_down</i>
-                                </a>
-                            </div>
-                        </div>
-                    </li>
-                @if ($loop->last)
-                </ul>
-                @endif
-                @empty
-                <h5>Ainda não há tarefas nesse grupo :(</h5>
-                @endforelse
+            <div class="card-content" id="grouping-task-box-{{ $grouping->id }}">
+                <script>
+                    var taskBox = new TaskBox(...@json($grouping->tasks));
+
+                    document.getElementById('grouping-task-box-{{ $grouping->id }}')
+                        .appendChild(taskBox.element);
+                </script>
             </div>
         </div>
     </div>

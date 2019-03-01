@@ -57,25 +57,6 @@ taskForm.remove = (elem) => {
     taskForm.items = items;
 }
 
-/**
- * Sends to the server a request to update the item completed state
- * 
- * @param {Number} itemId The id of the item
- * @param {Boolean} completed Is the item completed or not?
- */
-taskForm.updateState = (itemId, completed) => {
-
-    if (completed) {
-        fetch(`/items/${itemId}/complete`, {
-            method: 'POST',
-        });
-    } else {
-        fetch(`/items/${itemId}/uncomplete`, {
-            method: 'POST',
-        });
-    }
-}
-
 taskForm.icons = [
     'access_alarm',
     'account_balance',
@@ -174,39 +155,10 @@ taskForm.iconSelector = (callback) => {
 }
 
 /**
- * Moves an task up on the client and then notifies the server
- * 
- * @param {Element} elem The element to move up
- * @param {Number} id The task id
- */
-taskForm.moveUp = (elem, id) => { 
-    // If we are the last ones, don't do anything
-    if (elem.previousElementSibling == null) {
-        return;
-    }
-
-    elem.parentElement.insertBefore(elem,elem.previousElementSibling);
-
-    fetch(`/tasks/${id}/moveup`, {
-        method: 'POST',
-    });
-}
-
-/**
  * Moves an task down on the client and then notifies the server
  * 
  * @param {Element} elem The element to move down
  * @param {Number} id The task id
  */
 taskForm.moveDown = (elem, id) => {
-    // If we are the last ones, don't do anything
-    if (elem.nextElementSibling == null) {
-        return;
-    }
-
-    elem.parentElement.insertBefore(elem,elem.nextElementSibling.nextSibling);
-
-    fetch(`/tasks/${id}/movedown`, {
-        method: 'POST',
-    });
 }
