@@ -101,7 +101,7 @@ class TaskController extends Controller
         }
 
         if ($task->grouping->user != Auth::user()) {
-            return redirect()->back()->withErrors('You don\'t own this item!'); 
+            return redirect()->back()->withErrors('You don\'t own this task!'); 
         }
 
         // Get who is right below us
@@ -127,5 +127,21 @@ class TaskController extends Controller
         $task->save();
 
         return redirect()->back();
+    }
+
+    public function delete(Request $req, $id) {
+
+        $task = Task::find($id);
+
+        if (!$task) {
+            return redirect()->back()->withErrors('This item does not exist!'); 
+        }
+
+        if ($task->grouping->user != Auth::user()) {
+            return redirect()->back()->withErrors('You don\'t own this item!'); 
+        }
+
+        $task->items()->delete();
+        $task->delete();
     }
 }

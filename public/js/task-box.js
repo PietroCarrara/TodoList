@@ -247,6 +247,29 @@ class Task {
     }
 
     delete() {
-        
+        var modal = ui.Modal(`<h5>Isso irá <strong>permanentemente deletar</strong> a tarefa ${this.name}. Tem certeza?</h5>`, {
+            buttons: [
+                ui.Button({
+                    type: 'btn',
+                    classList: ['grey'],
+                    onclick: () => modal.close(),
+                    text: 'cancelar',
+                }),
+                ui.Button({
+                    type: 'btn',
+                    classList: ['red'],
+                    text: '<strong>Deletar</strong>',
+                    onclick: () => {
+                        modal.close();
+                        this.parent.remove(this);
+                        fetch(`/tasks/${this.id}/delete`, {
+                            method: 'POST',
+                        });
+                    },
+                }),
+            ]
+        });
+
+        modal.open();
     }
 }

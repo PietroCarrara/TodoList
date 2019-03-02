@@ -23,6 +23,7 @@ Route::get('/logout', 'AuthController@logout')->name('logout');
 Route::post('/groupings/create', 'GroupingController@createPost')->name('grouping.create');
 
 Route::post('/tasks/create', 'TaskController@createPost')->name('task.create');
+Route::post('/tasks/{id}/delete', 'TaskController@delete')->name('task.delete');
 Route::post('/tasks/{id}/moveup', 'TaskController@moveUp')->name('task.moveup');
 Route::post('/tasks/{id}/movedown', 'TaskController@moveDown')->name('task.movedown');
 

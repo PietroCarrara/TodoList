@@ -13,7 +13,7 @@ ui.Button = (opts) => {
     }
 
     if (opts.text) {
-        bt.innerText = opts.text;
+        bt.innerHTML = opts.text;
     } else if (opts.icon) {
         bt.innerHTML = `<i class="material-icons">${opts.icon}</i>`;
     } else {
@@ -73,8 +73,14 @@ ui.Modal = (content = null, opts = {}) => {
     } else {
         throw 'content must be a String or a Element for ui.Modal!';
     }
-
     root.appendChild(content);
+
+    if (opts.buttons) {
+        var footer = root.appendChild(document.createElement('div'));
+        footer.classList.add('modal-footer');
+        footer.append(...opts.buttons);
+    }
+
 
     // Initialize the modal
     document.body.appendChild(root);
