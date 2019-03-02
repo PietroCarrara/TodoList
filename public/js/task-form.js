@@ -26,12 +26,11 @@ taskForm.addItem = (elem) => {
     var trashCol = root.appendChild(document.createElement('div'));
     trashCol.classList.add('col', 's2');
 
-    var trash = trashCol.appendChild(document.createElement('a'));
-    trash.classList.add('btn-floating', 'red');
-    trash.innerHTML = '<i class="large material-icons">delete</i>';
-    trash.onclick = () => {
-        taskForm.remove(root);
-    };
+    var trash = trashCol.appendChild(ui.Button({
+        classList: ['red'],
+        icon: 'delete',
+        onclick: () => taskForm.remove(root),
+    }));
 
     elem.insertAdjacentElement('beforebegin', root);
 
@@ -112,12 +111,7 @@ taskForm.icons = [
  */
 taskForm.iconSelector = (callback) => {
 
-    // Create the modal
-    var root = document.createElement('div');
-    root.classList.add('modal');
-
-    var content = root.appendChild(document.createElement('div'))
-    content.classList.add('modal-content');
+    var content = document.createElement('div');
 
     var title = content.appendChild(document.createElement('h4'));
     title.innerText = 'Selecione um ícone:';
@@ -141,12 +135,9 @@ taskForm.iconSelector = (callback) => {
         }
     }
 
-    document.body.appendChild(root);
-
-    // Initialize the modal
-    var modal = M.Modal.init(root, {
+    var modal = ui.Modal(content, {
         onCloseEnd: () => {
-            root.parentElement.removeChild(root);
+            modal.destroy();
         },
     });
 

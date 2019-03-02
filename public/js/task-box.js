@@ -119,15 +119,24 @@ class Task {
         var buttons = this.buttons = body.appendChild(document.createElement('div'));
         buttons.classList.add('right');
 
-        var up = buttons.appendChild(document.createElement('a'));
-        up.classList.add('waves-effect', 'red', 'btn-floating');
-        up.innerHTML = '<i class="material-icons">keyboard_arrow_up</i>'
-        up.onclick = () => this.moveUp();
+        buttons.appendChild(ui.Button({
+            classList: ['red'],
+            icon: 'keyboard_arrow_up',
+            onclick: () => this.moveUp(),
+        }));
 
-        var down = buttons.appendChild(document.createElement('a'));
-        down.classList.add('waves-effect', 'red', 'btn-floating');
-        down.innerHTML = '<i class="material-icons">keyboard_arrow_down</i>';
-        down.onclick = () => this.moveDown();
+        buttons.appendChild(ui.Button({
+            classList: ['red'],
+            icon: 'keyboard_arrow_down',
+            onclick: () => this.moveDown(),
+        }));
+
+        buttons.appendChild(ui.Button({
+            classList: ['red'],
+            icon: 'delete',
+            onclick: () => this.delete(),
+        }));
+
     }
 
     /**
@@ -192,22 +201,7 @@ class Task {
     destroy(notifyText, callback) {
         this.parent.remove(this);
 
-        // Notify the completion of this task
-        var root = document.createElement('div');
-        var text = root.appendChild(document.createElement('span'));
-        text.innerHTML = notifyText;
-
-        // Button that undoes the task completion
-        var bt = root.appendChild(document.createElement('a'));
-        bt.innerText = 'Desfazer';
-        bt.classList.add('btn-flat', 'toast-action');
-        bt.onclick = () => {
-            callback();
-            toast.dismiss();
-        }
-        var toast = M.toast({
-            html: root,
-        });
+        ui.Notify(notifyText, callback);
     }
 
     moveUp() {
@@ -225,6 +219,7 @@ class Task {
 
         this.element.parentElement.insertBefore(this.element, elem);
 
+        // Notify the server
         fetch(`/tasks/${this.id}/moveup`, {
             method: 'POST',
         });
@@ -245,8 +240,13 @@ class Task {
 
         this.element.parentElement.insertBefore(this.element, elem.nextSibling);
 
+        // Notify the server
         fetch(`/tasks/${this.id}/movedown`, {
             method: 'POST',
         });
+    }
+
+    delete() {
+        
     }
 }
