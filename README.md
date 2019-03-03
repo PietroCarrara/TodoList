@@ -34,3 +34,6 @@ Ligar o servidor
 ```
 php artisan serve
 ```
+
+## Utilização
+[![Exemplo](https://i.imgur.com/XQHS51I.png)](https://imgur.com/saVB4Jy)
