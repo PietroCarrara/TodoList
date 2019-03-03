@@ -21,6 +21,7 @@ Route::post('/register', 'AuthController@registerPost')->name('register.post');
 Route::get('/logout', 'AuthController@logout')->name('logout');
 
 Route::post('/groupings/create', 'GroupingController@createPost')->name('grouping.create');
+Route::get('/groupings/{id}/delete', 'GroupingController@delete')->name('grouping.delete');
 
 Route::post('/tasks/create', 'TaskController@createPost')->name('task.create');
 Route::post('/tasks/{id}/delete', 'TaskController@delete')->name('task.delete');

@@ -1,9 +1,9 @@
 @csrf
 <input type="hidden" name="grouping_id" value="{{ $grouping->id }}">
 <div class="input-field col s4 m2 center">
-    <input type="hidden" name="icon"/><a class="btn" onclick="taskForm.iconSelector((icon) => {
-        console.log(this.previousSibling);
-        this.previousSibling.value = icon;
+    <input type="hidden" name="icon"/>
+    <a class="btn" onclick="taskForm.iconSelector((icon) => {
+        this.previousElementSibling.value = icon;
         this.innerHTML = `<i class='material-icons'>${icon}</i>`;
     })">
         Ícone

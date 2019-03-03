@@ -1,6 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
+{{-- Cards no carousel --}}
 <div class="row">
         @forelse(Auth::user()->groupings as $grouping)
             @if ($loop->first)
@@ -22,25 +23,39 @@
     </div>
 </div>
 
+{{-- Modals para criar tarefa e deletar grupos --}}
 @foreach(Auth::user()->groupings as $grouping)
-<form action="{{ route('task.create') }}" method="POST">
-    @modal(['id' => "grouping-task-modal-$grouping->id", 'class' => 'grouping-task-modal'])
-    <h4>{{ $grouping->name }}</h4>
-    <h5>Criar Tarefa</h5>
-    <small>Uma tarefa representa alguma coisa que deve ser cumprida, decomposta em alguns passos menores.</small>
+    <form action="{{ route('task.create') }}" method="POST">
+        @modal(['id' => "grouping-task-modal-$grouping->id", 'class' => 'grouping-task-modal'])
+        <h4>{{ $grouping->name }}</h4>
+        <h5>Criar Tarefa</h5>
+        <small>Uma tarefa representa alguma coisa que deve ser cumprida, decomposta em alguns passos menores.</small>
 
-    <div class="row">
-        @include('components.forms.task', [
-        'hideBt' => true,
-        'grouping' => $grouping,
-        ])
-    </div>
-    @slot('footer')
-    <button class="waves-effect btn waves-green" type="submit">Criar</button>
-    <a href="#!" class="modal-close waves-effect waves-grey btn-flat">Cancelar</a>
-    @endslot
+        <div class="row">
+            @include('components.forms.task', [
+            'hideBt' => true,
+            'grouping' => $grouping,
+            ])
+        </div>
+        @slot('footer')
+            <button class="waves-effect btn waves-green" type="submit">Criar</button>
+            <a href="#!" class="modal-close waves-effect waves-grey btn-flat">Cancelar</a>
+        @endslot
+        @endmodal
+    </form>
+
+    @modal(['id' => "grouping-delete-modal-$grouping->id"])
+
+        <h4>
+            Isso <strong>deletará permanentemente</strong> o grupo "{{ $grouping->name }}" e suas tarefas ativas e concluídas.
+            Tem certeza disso?
+        </h4>
+
+        @slot('footer')
+            <a href="{{ route('grouping.delete', $grouping->id) }}" class="waves-effect btn red" type="submit">Deletar</button>
+            <a href="#!" class="modal-close waves-effect grey btn-flat">Cancelar</a>
+        @endslot
     @endmodal
-</form>
 @endforeach
 
 <form action="{{ route('grouping.create') }}" method="POST">

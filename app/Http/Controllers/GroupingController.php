@@ -31,4 +31,24 @@ class GroupingController extends Controller
 
         return redirect(route('home'));
     }
+
+    public function delete($id) {
+        $gp = Grouping::find($id);
+
+        if (!$gp) {
+            return redirect()->back()->withErrors('That group does not exist!');
+        }
+
+        if (Auth::user() != $gp->user) {
+            return redirect()->back()->withErrors("You don't own that group!");
+        }
+
+        foreach($gp->tasks as $task) {
+            $task->items()->delete();
+        }
+        $gp->tasks()->delete();
+        $gp->delete();
+
+        return redirect()->back();
+    }
 }
