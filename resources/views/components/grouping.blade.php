@@ -18,13 +18,13 @@
                         for(var t of jsonData) {
                             tasks.push(new TaskCompleted(t));
                         }
-                        var taskBox = new TaskBoxCompleted(...tasks);
+                        var taskBox = new TaskBoxCompleted(@json($grouping), ...tasks);
                     @else
                         var jsonData = @json($grouping->incompleteTasks());
                         for(var t of jsonData) {
                             tasks.push(new Task(t));
                         }
-                        var taskBox = new TaskBox(...tasks);
+                        var taskBox = new TaskBox(@json($grouping), ...tasks);
                     @endif
 
                     document.getElementById('grouping-task-box-{{ $grouping->id }}')

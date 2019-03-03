@@ -49,6 +49,48 @@ class TaskController extends Controller
         return redirect(route('home'));
     }
 
+    public function edit(Request $req, $id) {
+
+        $req->validate([
+            'name' => 'required',
+            'icon' => 'required',
+            'grouping_id' => 'required|exists:groupings,id',
+            'items' => 'required|array|min:1',
+            'items.*' => 'min:1',
+        ]);
+
+        $task = Task::find($id);
+        
+        if (!$task) {
+            return redirect()->back()->withErrors('This item does not exist!'); 
+        }
+
+        if ($task->grouping->user != Auth::user()) {
+            return redirect()->back()->withErrors('You don\'t own this task!');
+        }
+
+        $task->name = $req->name;
+        $task->icon = $req->icon;
+
+        $task->items()->delete();
+        foreach($req->items as $key => $item) {
+            Item::create([
+                'desc' => $item,
+                'task_id' => $task->id,
+            ]);
+        }
+
+        if ($task->grouping_id != $req->grouping_id) {
+            $task->grouping_id = $req->grouping_id;
+            $group = Grouping::find($req->grouping_id);
+            $task->index = $group->incompleteTasks()->max('index') + 1;
+        }
+
+        $task->save();
+
+        return redirect(route('home'));
+    }
+
     /**
      * Decreases the index of a given task, so it appears more to the top
      */

@@ -1,5 +1,18 @@
+var __groups__ = [];
+
 class TaskBox {
-    constructor(...tasks) {
+
+    static getAll() {
+        return __groups__;
+    }
+
+    constructor(info, ...tasks) {
+
+        TaskBox.getAll().push(this);
+
+        this.name = info.name;
+        this.id = info.id;
+
         this.tasks = [];
 
         this.element = document.createElement('div');
@@ -137,6 +150,11 @@ class Task {
             onclick: () => this.delete(),
         }));
 
+        buttons.appendChild(ui.Button({
+            classList: ['red'],
+            icon: 'edit',
+            onclick: () => this.edit(),
+        }));
     }
 
     /**
@@ -271,5 +289,115 @@ class Task {
         });
 
         modal.open();
+    }
+
+    edit() {
+        var form = ui.Form(`Editando "${this.name}"`, {
+            action: `/tasks/${this.id}/edit`,
+            method: 'POST',
+        });
+
+        var top = form.appendChild(document.createElement('div'));
+        top.classList.add('row');
+
+        var icon = top.appendChild(document.createElement('input'));
+        icon.type = 'hidden';
+        icon.name = 'icon';
+        icon.value = this.icon;
+
+        top.appendChild(ui.Button({
+            icon: this.icon,
+            type: 'btn',
+            classList: ['left'],
+            onclick: (ev) => {
+                taskForm.iconSelector((i) => {
+                    icon.value = i;
+                    ev.target.innerHTML = `<i class="material-icons">${i}</i>`;
+                });
+            },
+        }))
+
+        top.appendChild(ui.Input('text', {
+            name: 'name',
+            label: 'Nome',
+            sizes: ['s10'],
+            value: this.name,
+        }));
+
+        form.appendChild(document.createElement('h5'))
+            .innerText = 'Grupo:';
+
+        var select = form.appendChild(ui.Select({ name: 'grouping_id' }));
+        for (var group of TaskBox.getAll()) {
+            var opt = ui.Option(group.name, {
+                value: group.id,
+                selected: this.parent == group,
+            });
+
+            select.push(opt);
+        }
+        setTimeout(select.init, 100);
+
+        form.appendChild(document.createElement('h5'))
+            .innerText = 'Passos:';
+
+        var items = form.appendChild(document.createElement('div'));
+
+        // Make a item field with a name, isCompleted and a delete button
+        function itemField(item = {}) {
+            var div = document.createElement('div');
+            div.classList.add('row');
+
+            var text = ui.Input('text', {
+                value: item.desc || '',
+                label: 'Descrição do passo',
+                name: 'items[]',
+                sizes: ['s10'],
+            })
+
+            var bt = ui.Button({
+                icon: 'delete',
+                classList: ['red'],
+                onclick: () => {
+                    div.parentElement.removeChild(div);
+                },
+            });
+
+            div.appendChild(text);
+            div.appendChild(bt);
+
+            return div;
+        }
+
+        for (var item of this.items) {
+            items.appendChild(itemField(item));
+        }
+
+        form.appendChild(ui.Button({
+            icon: 'add',
+            classList: ['red', 'btn-large', 'right'],
+            onclick: () => {
+                items.appendChild(itemField());
+            },
+        }));
+
+        var send = ui.Button({
+            text: 'Salvar',
+            classList: ['green'],
+            type: 'btn',
+            onclick: () => {
+                form.submit();
+            }
+        })
+
+        var modal = ui.Modal(form, {
+            buttons: [
+                send,
+            ],
+            onCloseEnd: () => modal.destroy(),
+        });
+        modal.open();
+
+        return form;
     }
 }

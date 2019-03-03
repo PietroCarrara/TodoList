@@ -88,3 +88,100 @@ ui.Modal = (content = null, opts = {}) => {
         onCloseEnd: opts.onCloseEnd,
     });
 }
+
+ui.Form = (title, opts = {}) => {
+    var form = document.createElement('form');
+    form.classList.add('row');
+    form.method = opts.method;
+    form.action = opts.action;
+
+    var header = form.appendChild(document.createElement('h4'));
+    header.innerHTML = title;
+    header.style.marginBottom = '3rem';
+
+    form.appendChild(ui.Csrf());
+
+    return form;
+}
+
+ui.Input = (type, opts = {}) => {
+
+    opts.sizes = opts.sizes || ['s12'];
+
+    var root = document.createElement('div');
+    root.classList.add('input-field', 'col', ...opts.sizes);
+
+    var inp = root.appendChild(document.createElement('input'));
+    inp.type = type;
+    inp.name = opts.name;
+    if (opts.value) inp.value = opts.value;
+    if (opts.label) {
+        var label = root.appendChild(document.createElement('label'));
+        label.innerHTML = opts.label;
+        if (opts.value) {
+            label.classList.add('active');
+        }
+    }
+
+    return root;
+}
+
+ui.Checkbox = (text, opts = {}) => {
+
+    opts.sizes = opts.sizes || ['s12'];
+
+    var root = document.createElement('label');
+    root.classList.add('input-field', 'col', ...opts.sizes);
+
+    var inp = root.appendChild(document.createElement('input'));
+    inp.type = 'checkbox';
+    inp.name = opts.name;
+    inp.checked = opts.checked;
+    inp.disabled = opts.disabled;
+
+    var span = root.appendChild(document.createElement('span'));
+    span.append(text);
+
+    return root;
+}
+
+ui.Csrf = () => {
+    var meta = document.querySelector('meta[name="csrf-token"');
+    if (meta == null) {
+        throw 'No csrf token provided in <meta>!';
+    } 
+
+    var inp = document.createElement('input');
+    inp.type = 'hidden';
+    inp.value = meta.content;
+    inp.name = '_token';
+
+    return inp;
+}
+
+ui.Select = (opts = {}) => {
+
+    opts.sizes = opts.sizes || ['s12'];
+
+    var root = document.createElement('div');
+    root.classList.add('input-field', 'col', ...opts.sizes);
+
+    var select = root.appendChild(document.createElement('select'));
+    select.name = opts.name;
+
+    root.push = (arg) => select.append(arg);
+    root.init = () => M.FormSelect.init(select);
+
+    return root;
+}
+
+ui.Option = (text, opts = {}) => {
+
+    var opt = document.createElement('option');
+    opt.innerHTML = text;
+    opt.value = opts.value;
+    opt.disabled = opts.disabled;
+    opt.selected = opts.selected;
+
+    return opt;
+}
