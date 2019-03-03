@@ -16,7 +16,7 @@ class TaskCompleted extends Task {
         }
 
         // Button to reactivate a task
-        this.buttons.appendChild(ui.Button({
+        this.bts['unarchive'] = this.buttons.appendChild(ui.Button({
             classList: ['green'],
             icon: 'unarchive',
             onclick: () => {
@@ -47,8 +47,15 @@ class TaskCompleted extends Task {
                 })
             }
         }));
+
+        // Hide the edit button
+        this.hide('edit');
     }
 
+    /**
+     * Items of a complete task are immutable,
+     * so nothing should happen when they are changed
+     */
     onchange() {
 
     }

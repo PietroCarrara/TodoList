@@ -2,8 +2,27 @@ var __groups__ = [];
 
 class TaskBox {
 
+    /**
+     * Returns all TaskBoxes in the page
+     */
     static getAll() {
         return __groups__;
+    }
+
+    /**
+     * Compares two tasks. For use with Array.sort()
+     * @param {Task} a Task a
+     * @param {Task} b Task b
+     */
+    static orderTasks(a, b) {
+        if (a.index < b.index) {
+            return -1;
+        }
+        if (a.index > b.index) {
+            return 1;
+        }
+
+        return 0;
     }
 
     constructor(info, ...tasks) {
@@ -32,6 +51,8 @@ class TaskBox {
         if (tasks.length > 0) {
             this.text.style.display = 'none';
         }
+
+        this.onchangeorder();
     }
 
     /**
@@ -45,7 +66,7 @@ class TaskBox {
 
         task.parent = this;
         this.tasks.push(task);
-        this.tasks = this.tasks.sort((a, b) => a.index > b.index);
+        this.tasks = this.tasks.sort(TaskBox.orderTasks);
 
         task.element.classList.add('animated', 'zoomInRight');
 
@@ -74,7 +95,7 @@ class TaskBox {
             task.element.parentElement.removeChild(task.element);
             task.element.classList.remove('animated', 'zoomOutRight');
 
-            this.tasks = this.tasks.filter((i) => i != task).sort((a, b) => a.index > b.index);
+            this.tasks = this.tasks.filter((i) => i != task).sort(TaskBox.orderTasks);
 
             if (this.tasks.length <= 0) {
                 this.text.style.display = 'inherit';
@@ -84,6 +105,30 @@ class TaskBox {
         };
 
         task.element.addEventListener('animationend', animationEnd);
+    }
+
+    /**
+     * Should be called everytime a tasks' index changes.
+     * Orders the task array and hide buttons that would be useless
+     */
+    onchangeorder() {
+
+        if (this.tasks.length <= 0) {
+            return;
+        }
+
+        this.tasks = this.tasks.sort(TaskBox.orderTasks);
+
+        // Reset every button
+        for (var i = 0; i < this.tasks.length; i++) {
+            this.tasks[i].show('moveUp', 'moveDown');
+        }
+
+        // The first task can't moveUp
+        this.tasks[0].hide('moveUp');
+
+        // The last task can't moveDown
+        this.tasks[this.tasks.length - 1].hide('moveDown');
     }
 }
 
@@ -95,6 +140,7 @@ class Task {
         this.name = json.name;
         this.completed = json.completed;
         this.items = json.items || [];
+        this.bts = [];
 
         // Ceating the DOMElement
         var elem = this.element = document.createElement('li');
@@ -132,25 +178,25 @@ class Task {
         var buttons = this.buttons = body.appendChild(document.createElement('div'));
         buttons.classList.add('right');
 
-        buttons.appendChild(ui.Button({
+        this.bts['moveUp'] = buttons.appendChild(ui.Button({
             classList: ['red'],
             icon: 'keyboard_arrow_up',
             onclick: () => this.moveUp(),
         }));
 
-        buttons.appendChild(ui.Button({
+        this.bts['moveDown'] = buttons.appendChild(ui.Button({
             classList: ['red'],
             icon: 'keyboard_arrow_down',
             onclick: () => this.moveDown(),
         }));
 
-        buttons.appendChild(ui.Button({
+        this.bts['delete'] = buttons.appendChild(ui.Button({
             classList: ['red'],
             icon: 'delete',
             onclick: () => this.delete(),
         }));
 
-        buttons.appendChild(ui.Button({
+        this.bts['edit'] = buttons.appendChild(ui.Button({
             classList: ['red'],
             icon: 'edit',
             onclick: () => this.edit(),
@@ -168,6 +214,26 @@ class Task {
         }
 
         return true;
+    }
+
+    /**
+     * Show the informed buttons
+     * @param  {...string} bts Names of the buttons
+     */
+    show(...bts) {
+        for (var bt of bts) {
+            this.bts[bt].style.display = '';
+        }
+    }
+
+    /**
+     * Hide the informed buttons
+     * @param  {...string} bts Names of the buttons
+     */
+    hide(...bts) {
+        for (var bt of bts) {
+            this.bts[bt].style.display = 'none';
+        }
     }
 
     /**
@@ -222,6 +288,9 @@ class Task {
         ui.Notify(notifyText, callback);
     }
 
+    /**
+     * Moves this task up
+     */
     moveUp() {
         // If we are the first ones, don't do anything
         if (this.element.previousElementSibling == null) {
@@ -237,12 +306,17 @@ class Task {
 
         this.element.parentElement.insertBefore(this.element, elem);
 
+        this.parent.onchangeorder();
+
         // Notify the server
         fetch(`/tasks/${this.id}/moveup`, {
             method: 'POST',
         });
     }
 
+    /**
+     * Moves this task down
+     */
     moveDown() {
         // If we are the last ones, don't do anything
         if (this.element.nextElementSibling == null) {
@@ -258,12 +332,17 @@ class Task {
 
         this.element.parentElement.insertBefore(this.element, elem.nextSibling);
 
+        this.parent.onchangeorder();
+
         // Notify the server
         fetch(`/tasks/${this.id}/movedown`, {
             method: 'POST',
         });
     }
 
+    /**
+     * Delete this task
+     */
     delete() {
         var modal = ui.Modal(`<h5>Isso irá <strong>permanentemente deletar</strong> a tarefa ${this.name}. Tem certeza?</h5>`, {
             buttons: [
@@ -291,6 +370,9 @@ class Task {
         modal.open();
     }
 
+    /**
+     * Open the modal to edit this task
+     */
     edit() {
         var form = ui.Form(`Editando "${this.name}"`, {
             action: `/tasks/${this.id}/edit`,

@@ -69,6 +69,10 @@ class TaskController extends Controller
             return redirect()->back()->withErrors('You don\'t own this task!');
         }
 
+        if ($task->isCompleted()) {
+            return redirect()->back()->withErrors('If you want to edit this task, reactivate it first!');
+        }
+
         $task->name = $req->name;
         $task->icon = $req->icon;
 
