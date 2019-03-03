@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -21,20 +21,31 @@
             <nav>
                 <div class="nav-wrapper">
                     <a href="{{ route('home') }}" class="brand-logo">TodoList</a>
+                    <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                     <ul class="right hide-on-med-and-down">
                         @auth
-                            <li><a href="{{ route('home') }}">Ativas</a></li>
-                            <li><a href="{{ route('completed') }}">Concluídas</a></li>
-                            <li><a href="{{ route('logout') }}">Logout</a></li>
+                        <li><a href="{{ route('home') }}">Tarefas Ativas</a></li>
+                        <li><a href="{{ route('completed') }}">Tarefas Concluídas</a></li>
+                        <li><a href="{{ route('logout') }}">Logout</a></li>
                         @else
-                            <li><a href="{{ route('register') }}">Registrar</a></li>
-                            <li><a href="{{ route('login') }}">Login</a></li>
+                        <li><a href="{{ route('register') }}">Registrar</a></li>
+                        <li><a href="{{ route('login') }}">Login</a></li>
                         @endauth
 
                     </ul>
                 </div>
             </nav>
         </div>
+        <ul class="sidenav" id="mobile-nav">
+            @auth
+            <li><a href="{{ route('home') }}">Tarefas Ativas</a></li>
+            <li><a href="{{ route('completed') }}">Tarefas Concluídas</a></li>
+            <li><a href="{{ route('logout') }}">Logout</a></li>
+            @else
+            <li><a href="{{ route('register') }}">Registrar</a></li>
+            <li><a href="{{ route('login') }}">Login</a></li>
+            @endauth
+        </ul>
     </header>
 
 
@@ -46,7 +57,7 @@
         {{-- Display errors as toasts --}}
         @if ($errors->any())
         <script>
-            var errors = @json($errors->all());
+            var errors = @json($errors -> all());
 
             for (var err of errors) {
                 M.toast({

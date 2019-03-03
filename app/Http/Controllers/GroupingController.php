@@ -12,7 +12,7 @@ class GroupingController extends Controller
         $this->middleware('auth');
     }
 
-    public function createPost(Request $req) {
+    public function create(Request $req) {
 
         $req->validate([
             'name' => 'required',

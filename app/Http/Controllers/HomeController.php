@@ -10,11 +10,11 @@ class HomeController extends Controller
         $this->middleware('auth');
     }
 
-    public function index() {
+    public function activeTasks() {
         return view('home');
     }
 
-    public function completed() {
+    public function completedTasks() {
         return view('home',[
             'completed' => true,
         ]);

@@ -12,7 +12,6 @@ class ItemController extends Controller
         $this->middleware('auth');
     }
 
-
     public function complete(Request $req, $id) {
         $this->setCompleted($req, $id, true);
     }

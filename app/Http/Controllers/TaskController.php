@@ -10,7 +10,7 @@ use App\Grouping;
 
 class TaskController extends Controller
 {
-    public function createPost(Request $req) {
+    public function create(Request $req) {
 
         $req->validate([
             'name' => 'required',
@@ -76,6 +76,7 @@ class TaskController extends Controller
         $task->name = $req->name;
         $task->icon = $req->icon;
 
+        // Replace the old items with new ones
         $task->items()->delete();
         foreach($req->items as $key => $item) {
             Item::create([
@@ -84,6 +85,7 @@ class TaskController extends Controller
             ]);
         }
 
+        // Adjust the index so it matches the new group
         if ($task->grouping_id != $req->grouping_id) {
             $task->grouping_id = $req->grouping_id;
             $group = Grouping::find($req->grouping_id);
@@ -180,11 +182,11 @@ class TaskController extends Controller
         $task = Task::find($id);
 
         if (!$task) {
-            return redirect()->back()->withErrors('This item does not exist!'); 
+            return redirect()->back()->withErrors('This task does not exist!'); 
         }
 
         if ($task->grouping->user != Auth::user()) {
-            return redirect()->back()->withErrors('You don\'t own this item!'); 
+            return redirect()->back()->withErrors('You don\'t own this task!'); 
         }
 
         $task->items()->delete();
